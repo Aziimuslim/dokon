@@ -1,0 +1,34 @@
+# Ishga tushirish:  cp .env.example .env  (qiymatlarni o'zgartiring)  &&  docker compose up -d --build
+# Demo ma'lumot:    docker compose exec app node src/db/seed.js
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: dokon
+      POSTGRES_USER: dokon
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-dokon123}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dokon"]
+      interval: 5s
+      retries: 10
+
+  app:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      db: { condition: service_healthy }
+    env_file: .env
+    environment:
+      DATABASE_URL: postgres://dokon:${DB_PASSWORD:-dokon123}@db:5432/dokon
+      NODE_ENV: production
+    volumes:
+      - uploads:/app/backend/uploads
+    ports:
+      - "127.0.0.1:4000:4000"   # tashqariga faqat Nginx orqali
+
+volumes:
+  pgdata:
+  uploads:
