@@ -50,6 +50,13 @@ function svg(emoji, c1, c2) {
 </svg>`;
 }
 
+/** Demo rasmlarini diskka yozish (vaqtinchalik diskli hostinglarda har ishga tushganda tiklanadi) */
+export function writeSeedImages() {
+  products.forEach(([, , , , emoji, c1, c2], i) => {
+    fs.writeFileSync(path.join(UPLOAD_DIR, `seed-${i + 1}.svg`), svg(emoji, c1, c2));
+  });
+}
+
 export async function seed({ reset = false } = {}) {
   await migrate();
   const client = await pool.connect();
@@ -74,7 +81,7 @@ export async function seed({ reset = false } = {}) {
     for (const [name, cat, price, discount, emoji, c1, c2, desc, ingr, sold] of products) {
       i += 1;
       const file = `seed-${i}.svg`;
-      fs.writeFileSync(path.join(UPLOAD_DIR, file), svg(emoji, c1, c2));
+      fs.writeFileSync(path.join(UPLOAD_DIR, file), svg(emoji, c1, c2));  // eslint-disable-line
       await client.query(
         `INSERT INTO products (name, description, ingredients, price, discount, image, category_id, sold_count, created_at)
          VALUES ($1,$2,$3,$4,$5,$6,$7,$8, NOW() - ($9 || ' hours')::interval)`,

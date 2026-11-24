@@ -20,7 +20,7 @@ export const config = {
   jwtRefreshSecret: secret('JWT_REFRESH_SECRET', 'dev-refresh-secret'),
   orderSignSecret: secret('ORDER_SIGN_SECRET', 'dev-order-secret'),
   paymentSecret: secret('PAYMENT_PROVIDER_SECRET', 'dev-payment-secret'),
-  clientOrigin: (env.CLIENT_ORIGIN || 'http://localhost:5173').split(',').map((s) => s.trim()),
+  clientOrigin: (env.CLIENT_ORIGIN || env.RENDER_EXTERNAL_URL || 'http://localhost:5173').split(',').map((s) => s.trim()),
   accessTtl: env.ACCESS_TOKEN_TTL || '15m',
   refreshDays: Number(env.REFRESH_TOKEN_DAYS || 7),
   deliveryFee: Number(env.DELIVERY_FEE || 10000),

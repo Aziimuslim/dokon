@@ -12,6 +12,9 @@ Bajardi: Asqarov Azizbek, Raximjonov Kamoliddin, Odiljon Nuriddinov.
 | To'lov | Payme / Click / karta — **sandbox** (imzolangan callback bilan) |
 | Deploy | Docker / docker-compose, yoki Ubuntu VPS + PM2 + Nginx + Let's Encrypt |
 
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/Aziimuslim/dokon)
+[![CI](https://github.com/Aziimuslim/dokon/actions/workflows/ci.yml/badge.svg)](https://github.com/Aziimuslim/dokon/actions/workflows/ci.yml)
+
 ![Bosh sahifa](docs/screenshots/01-home.png)
 
 ---
@@ -133,7 +136,7 @@ Katalog filtrlari: `?q=&category=fastfud&min_price=&max_price=&sort=popular|pric
 
 ## 5. Ma'lumotlar bazasi (TZ §9)
 
-`backend/src/db/schema.sql` — TZ'dagi jadvallar (`users, categories, products, cart, orders, order_items`) va qo'shimcha: `refresh_tokens, addresses, promotions, order_status_history, payments, notifications`. Server ishga tushganda sxema avtomatik qo'llanadi.
+`backend/src/db/schema.sql` — TZ'dagi jadvallar (`users, categories, products, cart, orders, order_items`) va qo'shimcha: `refresh_tokens, addresses, promotions, order_status_history, payments, notifications`. Server ishga tushganda sxema avtomatik qo'llanadi; `SEED_DEMO=true` bo'lsa va baza bo'sh bo'lsa demo ma'lumotlar ham yuklanadi.
 
 ---
 
@@ -145,6 +148,8 @@ npm test
 ```
 
 16 ta test: narx hisobi, imzo, holat o'tishlari (unit) va API integratsion testlari — ro'yxat/login, refresh rotatsiyasi, rollar, SQL-injection, XSS, soxta imzo/summa bilan buyurtma, soxta to'lov callback'i, eskirgan narx bilan buyurtma, to'liq oqim *savat → to'lov → kuryer → yetkazildi*.
+
+GitHub Actions (`.github/workflows/ci.yml`) har bir push va pull request'da PostgreSQL bilan testlarni va frontend build'ni avtomatik tekshiradi.
 
 Bundan tashqari brauzerda (Playwright) to'liq oqim sinovdan o'tkazilgan: mehmon savati → ro'yxat → checkout → Payme sandbox → admin kuryer tayinlaydi → kuryer (mobil) yetkazadi. Telefon ekranida gorizontal skroll yo'q.
 
@@ -174,11 +179,15 @@ sudo certbot --nginx -d dokon.uz -d www.dokon.uz
 # Kunlik backup: crontab -e →  0 3 * * * /path/online-dokon/deploy/backup.sh
 ```
 
-### C) Render / Railway
-- PostgreSQL xizmatini yarating, `DATABASE_URL` ni oling.
-- Web service: build — `npm run install:all && npm run build`, start — `npm start`.
-- Environment: `NODE_ENV=production`, 4 ta sir, `CLIENT_ORIGIN=https://<sizning-domen>`.
-- Eslatma: bepul tariflarda disk vaqtinchalik — yuklangan rasmlar uchun doimiy disk ulang.
+### C) Render — bitta tugma bilan (tavsiya etiladi)
+1. Yuqoridagi **Deploy to Render** tugmasini bosing (GitHub orqali Render'ga kiring).
+2. **Apply** ni bosing. `render.yaml` bo'yicha PostgreSQL bazasi va veb-servis yaratiladi, 4 ta maxfiy kalit avtomatik generatsiya qilinadi.
+3. 3–5 daqiqadan so'ng sayt `https://online-dokon-xxxx.onrender.com` manzilida ochiladi. `SEED_DEMO=true` bo'lgani uchun demo mahsulotlar va hisoblar avtomatik yaratiladi.
+4. Har safar `main` ga push qilinganda Render saytni avtomatik yangilaydi.
+
+Bepul tarif cheklovlari: 15 daqiqa faolsizlikdan keyin servis "uxlaydi" (birinchi ochilish ~30 soniya), bepul baza 30 kundan keyin o'chiriladi, admin yuklagan rasmlar qayta ishga tushganda yo'qoladi (doimiy disk — pullik). Haqiqiy ishga tushirish uchun pullik tarif yoki VPS (A/B variant) tavsiya etiladi.
+
+Admin parolini darhol o'zgartiring: admin hisobi bilan kiring → Profil → Xavfsizlik.
 
 ---
 
