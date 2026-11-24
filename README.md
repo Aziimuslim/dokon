@@ -179,6 +179,9 @@ sudo certbot --nginx -d dokon.uz -d www.dokon.uz
 # Kunlik backup: crontab -e →  0 3 * * * /path/online-dokon/deploy/backup.sh
 ```
 
+### E) Docker'siz: GitHub → server (tavsiya etiladi, serveringiz bo'lsa)
+Bitta buyruq bilan Node.js + PostgreSQL + Caddy (HTTPS) o'rnatiladi, kod `git` orqali olinadi, `main` ga push qilinganda server avtomatik yangilanadi: **[deploy/README-native.md](deploy/README-native.md)**.
+
 ### D) O'z domeningiz (DuckDNS) bilan
 `reversdokon.duckdns.org` kabi bepul domen bilan HTTPS orqali ishga tushirish — o'z kompyuteringizda (Docker + Caddy) yoki Render orqali: **[deploy/duckdns/README.md](deploy/duckdns/README.md)**.
 

@@ -34,3 +34,28 @@ jobs:
         run: npm test
       - name: Frontend build
         run: npm run build
+
+  # main'ga push bo'lganda va testlar o'tsa — serverga avtomatik deploy.
+  # Sozlash: GitHub → Settings → Secrets and variables → Actions → New repository secret:
+  #   SSH_HOST — server IP yoki domen,  SSH_USER — root (yoki sudo huquqli foydalanuvchi),
+  #   SSH_KEY  — shu foydalanuvchi uchun private SSH kalit (deploy/README-native.md ga qarang).
+  # Secret'lar kiritilmaguncha bu qadam o'tkazib yuboriladi.
+  deploy:
+    needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    env:
+      SSH_HOST: ${{ secrets.SSH_HOST }}
+      SSH_USER: ${{ secrets.SSH_USER }}
+      SSH_KEY: ${{ secrets.SSH_KEY }}
+    steps:
+      - name: Server sozlanmagan — o'tkazib yuborildi
+        if: env.SSH_KEY == ''
+        run: echo "SSH_HOST/SSH_USER/SSH_KEY secret'lari yo'q — deploy o'tkazib yuborildi."
+      - name: Serverga deploy
+        if: env.SSH_KEY != ''
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/id_deploy && chmod 600 ~/.ssh/id_deploy
+          ssh-keyscan -H "$SSH_HOST" >> ~/.ssh/known_hosts 2>/dev/null
+          ssh -i ~/.ssh/id_deploy "$SSH_USER@$SSH_HOST" 'sudo bash /opt/dokon/deploy/update.sh'
