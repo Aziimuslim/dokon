@@ -1,0 +1,69 @@
+# O'z kompyuteringiz/serveringizda DuckDNS domeni bilan HTTPS orqali ishga tushirish.
+# Loyiha ildizidan:
+#   cp deploy/duckdns/.env.example deploy/duckdns/.env      (qiymatlarni to'ldiring)
+#   docker compose -f deploy/duckdns/docker-compose.yml --env-file deploy/duckdns/.env up -d --build
+name: dokon
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: dokon
+      POSTGRES_USER: dokon
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD kiritilmagan}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dokon"]
+      interval: 5s
+      retries: 10
+
+  app:
+    build: ../..
+    restart: unless-stopped
+    depends_on:
+      db: { condition: service_healthy }
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgres://dokon:${DB_PASSWORD}@db:5432/dokon
+      CLIENT_ORIGIN: https://${DOMAIN}
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:?kiritilmagan}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:?kiritilmagan}
+      ORDER_SIGN_SECRET: ${ORDER_SIGN_SECRET:?kiritilmagan}
+      PAYMENT_PROVIDER_SECRET: ${PAYMENT_PROVIDER_SECRET:?kiritilmagan}
+      SEED_DEMO: "true"
+    volumes:
+      - uploads:/app/backend/uploads
+
+  # HTTPS. Routerda 80 va 443 portlar shu kompyuterga yo'naltirilgan bo'lishi kerak.
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    depends_on: [app]
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      DOMAIN: ${DOMAIN:?DOMAIN kiritilmagan}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+
+  # DuckDNS IP'ini avtomatik yangilab turadi
+  duckdns:
+    image: curlimages/curl:8.11.1
+    restart: unless-stopped
+    environment:
+      DUCKDNS_SUBDOMAIN: ${DUCKDNS_SUBDOMAIN}
+      DUCKDNS_TOKEN: ${DUCKDNS_TOKEN}
+    volumes:
+      - ./update-ip.sh:/update-ip.sh:ro
+    entrypoint: ["/bin/sh", "/update-ip.sh"]
+
+volumes:
+  pgdata:
+  uploads:
+  caddy_data:
+  caddy_config:

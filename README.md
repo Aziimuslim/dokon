@@ -179,6 +179,9 @@ sudo certbot --nginx -d dokon.uz -d www.dokon.uz
 # Kunlik backup: crontab -e →  0 3 * * * /path/online-dokon/deploy/backup.sh
 ```
 
+### D) O'z domeningiz (DuckDNS) bilan
+`reversdokon.duckdns.org` kabi bepul domen bilan HTTPS orqali ishga tushirish — o'z kompyuteringizda (Docker + Caddy) yoki Render orqali: **[deploy/duckdns/README.md](deploy/duckdns/README.md)**.
+
 ### C) Render — bitta tugma bilan (tavsiya etiladi)
 1. Yuqoridagi **Deploy to Render** tugmasini bosing (GitHub orqali Render'ga kiring).
 2. **Apply** ni bosing. `render.yaml` bo'yicha PostgreSQL bazasi va veb-servis yaratiladi, 4 ta maxfiy kalit avtomatik generatsiya qilinadi.
