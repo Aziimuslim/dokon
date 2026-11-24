@@ -11,7 +11,25 @@ DuckDNS domeni faqat domen nomini IP manzilga bog'laydi. Sayt shu IP'dagi kompyu
 
 ---
 
-## ⚡ Serveringiz bo'lsa (Ubuntu/Debian) — bitta buyruq
+## 🪟 Windows kompyuterda — bitta buyruq
+
+**PowerShell'ni Administrator sifatida oching** (Start → PowerShell → o'ng tugma → *Run as administrator*) va yurgizing:
+```powershell
+irm https://raw.githubusercontent.com/Aziimuslim/dokon/main/deploy/windows-setup.ps1 | iex
+```
+Skript Docker Desktop'ni tekshiradi (yo'q bo'lsa o'rnatadi — keyin kompyuterni qayta yuklab, buyruqni yana yurgizasiz), kodni `C:\dokon` ga yuklaydi, DuckDNS tokenini so'raydi, maxfiy kalitlarni yaratadi, firewall'da 80/443 ni ochadi va saytni HTTPS bilan ishga tushiradi.
+
+Routerda **port forwarding** (80 va 443 → shu kompyuter) qilinishi shart — buni skript qila olmaydi (pastdagi A bo'limi, 4-qadam).
+
+---
+
+## ⚡ Linux serverda (Ubuntu/Debian) — bitta buyruq
+
+Bu buyruqlar **serverning o'zida** yuriladi, Windows PowerShell'da emas. Avval Windows'dan serverga ulaning:
+```powershell
+ssh root@SERVER_IP
+```
+So'ng serverda:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/Aziimuslim/dokon/main/deploy/server-setup.sh -o setup.sh
