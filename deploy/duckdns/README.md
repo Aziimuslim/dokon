@@ -11,6 +11,16 @@ DuckDNS domeni faqat domen nomini IP manzilga bog'laydi. Sayt shu IP'dagi kompyu
 
 ---
 
+## ⚡ Serveringiz bo'lsa (Ubuntu/Debian) — bitta buyruq
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Aziimuslim/dokon/main/deploy/server-setup.sh -o setup.sh
+sudo bash setup.sh
+```
+Skript DuckDNS tokenini so'raydi, qolganini o'zi bajaradi: Docker o'rnatadi, kodni `/opt/dokon` ga yuklaydi, maxfiy kalitlarni generatsiya qiladi, DuckDNS'ni server IP'siga yo'naltiradi, 80/443 portlarni ochadi, saytni HTTPS bilan ishga tushiradi. Yangilash uchun shu buyruqni qayta yurgizing — ma'lumotlar saqlanadi.
+
+---
+
 ## A) O'z kompyuteringizda (Docker + Caddy + DuckDNS)
 
 ### 1. Docker o'rnating
